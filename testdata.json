@@ -1,0 +1,42 @@
+{
+    "names": [
+        "Vänsterpartiet",
+        "Sverigedemokraterna",
+        "Miljöpartiet",
+        "Centerpartiet",
+        "Liberalerna",
+        "Moderaterna",
+        "Kristdemokraterna",
+        "Sverigedemokraterna"
+    ],
+    "letters": [
+        "V",
+        "S",
+        "MP",
+        "C",
+        "L",
+        "M",
+        "KD",
+        "SD"
+    ],
+    "colors": [
+        "#911414",
+        "#E02E3D",
+        "#82C882",
+        "#31A532",
+        "#1E69AA",
+        "#7DBEE1",
+        "#331D79",
+        "#FFC346"
+    ],
+    "percent": [
+        8.00,
+        28.26,
+        4.41,
+        8.61,
+        5.49,
+        19.84,
+        6.32,
+        17.53
+    ]
+}
