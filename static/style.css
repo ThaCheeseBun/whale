@@ -1,3 +1,5 @@
+@import url("adumu/adumu.css");
+
 body {
     margin: 0px;
     background-color: #000;
@@ -5,6 +7,8 @@ body {
 
     width: 1920px;
     height: 1080px;
+
+    font-family: "Adumu", sans-serif;
 }
 
 #template {
@@ -14,60 +18,21 @@ body {
     top: 0px;
     left: 0px;
     z-index: -1;
-    opacity: 0.2;
+    opacity: 0.1;
 }
 
 #app {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-#appc {
     position: absolute;
     top: 0px;
     left: 0px;
 }
 
-/* pie chart */
-#pie-container {
+#pie {
     position: absolute;
     height: 182px;
     width: 182px;
     left: 480px;
     top: 857px;
     z-index: 999;
-}
-
-/* BARS */
-.bar {
-    position: absolute;
-    bottom: 80px;
-    height: 300px;
-    width: 94px;
-}
-
-#bar-0 {
-    left: 714px;
-}
-#bar-1 {
-    left: 852px;
-}
-#bar-2 {
-    left: 990px;
-}
-#bar-3 {
-    left: 1128px;
-}
-#bar-4 {
-    left: 1266px;
-}
-#bar-5 {
-    left: 1404px;
-}
-#bar-6 {
-    left: 1544px;
-}
-#bar-7 {
-    left: 1682px;
+    transform: rotateZ(-90deg);
 }

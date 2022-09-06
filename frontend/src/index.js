@@ -1,151 +1,90 @@
-import { Chart, registerables } from "chart.js";
 import * as render from "./render.js";
-import * as util from "./util.js";
 
-// register stuff i need idfk
-Chart.register(registerables[0], registerables[1]);
-
-// socket go brr
-const socket = new WebSocket(`ws://${location.hostname}:${location.port}`);
-socket.addEventListener("message", function (msg) {
-
-    console.log(msg);
-    const json = JSON.parse(msg.data);
-
-    const ctx2 = document.querySelector("#appc").getContext("2d");
-
-    render.heightBars(ctx2, [712, 700, 1060, 300], {
-        "data": json.percent,
-        "text": json.letters,
-        "color": json.colors
-    });
-
-    // apply that shit to canvas
-    const ctx = document.querySelector("#pie").getContext("2d");
-    const chart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            datasets: [
-                {
-                    data: json.percent,
-                    backgroundColor: json.colors,
-                    borderWidth: 0,
-                }
-            ]
-        },
-        options: {
-            animation: false,
-        },
-    });
-
-    render.differenceBar(ctx2, [100, 800, 586, 68], {
-        "data": [
-            json.percent[0] +
-            json.percent[1] +
-            json.percent[2] +
-            json.percent[3],
-            json.percent[4] +
-            json.percent[5] +
-            json.percent[6] +
-            json.percent[7]
+// hold data and settings
+let currentData = {};
+let heightBars = [0, 1, 2, 3, 4, 5, 6, 7];
+let pieChart = [0, 1, 2, 3, 4, 5, 6, 7];
+let diffBars = [
+    {
+        data: [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7]
         ],
-        "text": [
-            json.letters[0] + "+" +
-            json.letters[1] + "+" +
-            json.letters[2] + "+" +
-            json.letters[3],
-            json.letters[4] + "+" +
-            json.letters[5] + "+" +
-            json.letters[6] + "+" +
-            json.letters[7]
-        ],
-        "color": [
+        color: [
             "#E02E3D",
             "#7DBEE1"
         ]
-    });
-
-    render.differenceBar(ctx2, [100, 900, 336, 40], {
-        "data": [
-            json.percent[0] +
-            json.percent[1] +
-            json.percent[2],
-            json.percent[7],
-            json.percent[3] +
-            json.percent[4] +
-            json.percent[5] +
-            json.percent[6]
+    },
+    {
+        data: [
+            [0, 1, 2],
+            [7],
+            [3, 4, 5, 6]
         ],
-        "text": [
-            json.letters[0] + "+" +
-            json.letters[1] + "+" +
-            json.letters[2],
-            json.letters[7],
-            json.letters[3] + "+" +
-            json.letters[4] + "+" +
-            json.letters[5] + "+" +
-            json.letters[6]
-        ],
-        "color": [
+        color: [
             "#E02E3D",
             "#FFC346",
             "#7DBEE1"
         ]
-    });
-
-    render.differenceBar(ctx2, [100, 950, 336, 40], {
-        "data": [
-            json.percent[0] +
-            json.percent[1] +
-            json.percent[2] +
-            json.percent[3] +
-            json.percent[4],
-            json.percent[5] +
-            json.percent[6] +
-            json.percent[7]
+    },
+    {
+        data: [
+            [0, 1, 2, 3, 4],
+            [5, 6, 7]
         ],
-        "text": [
-            json.letters[0] + "+" +
-            json.letters[1] + "+" +
-            json.letters[2] + "+" +
-            json.letters[3] + "+" +
-            json.letters[4],
-            json.letters[5] + "+" +
-            json.letters[6] + "+" +
-            json.letters[7]
-        ],
-        "color": [
+        color: [
             "#E02E3D",
             "#7DBEE1"
         ]
-    });
-
-    render.differenceBar(ctx2, [100, 1000, 336, 40], {
-        "data": [
-            json.percent[1] +
-            json.percent[2] +
-            json.percent[3],
-            json.percent[0],
-            json.percent[4] +
-            json.percent[5] +
-            json.percent[6] +
-            json.percent[7]
+    },
+    {
+        data: [
+            [1, 2, 3],
+            [0],
+            [4, 5, 6, 7]
         ],
-        "text": [
-            json.letters[1] + "+" +
-            json.letters[2] + "+" +
-            json.letters[3],
-            json.letters[0],
-            json.letters[4] + "+" +
-            json.letters[5] + "+" +
-            json.letters[6] + "+" +
-            json.letters[7]
-        ],
-        "color": [
+        color: [
             "#E02E3D",
             "#911414",
             "#7DBEE1"
         ]
-    });
+    }
+];
+
+// refresh all renders
+function refreshRender() {
+
+    // get render context
+    const ctx = document.querySelector("#app").getContext("2d");
+
+    // render the right bars
+    render.heightBars(ctx, [712, 700, 1060, 300], currentData, heightBars);
+
+    // render pie chart
+    const ctxPie = document.querySelector("#pie").getContext("2d");
+    render.pieChart(ctxPie, currentData, pieChart);
+
+    // b
+    render.differenceBar(ctx, [100, 800, 586, 68], currentData, diffBars[0]);
+    render.differenceBar(ctx, [100, 900, 336, 40], currentData, diffBars[1]);
+    render.differenceBar(ctx, [100, 950, 336, 40], currentData, diffBars[2]);
+    render.differenceBar(ctx, [100, 1000, 336, 40], currentData, diffBars[3]);
+
+}
+
+// socket go brr
+const socket = new WebSocket(`ws://${location.hostname}:${location.port}`);
+socket.addEventListener("message", function (data) {
+
+    const msg = JSON.parse(data.data);
+
+    switch (msg.type) {
+        case "data":
+            currentData = msg.data;
+            refreshRender();
+            break;
+        default:
+            console.error("Unknown message type \"" + msg.type + "\"");
+    }
 
 });
