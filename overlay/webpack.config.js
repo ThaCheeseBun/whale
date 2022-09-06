@@ -5,6 +5,6 @@ module.exports = {
     entry: path.resolve(__dirname, "src", "index.js"),
     output: {
         filename: "script.js",
-        path: path.resolve(__dirname, "..", "static"),
+        path: path.resolve(__dirname, "..", "static", "overlay"),
     },
 };
