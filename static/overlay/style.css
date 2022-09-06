@@ -1,14 +1,10 @@
 @import url("/adumu/adumu.css");
 
-body {
-    margin: 0px;
-    background-color: #000;
-    color: #ffffff;
-
-    width: 1920px;
-    height: 1080px;
-
-    font-family: "Adumu", sans-serif;
+#id {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 20px;
 }
 
 #template {
@@ -19,6 +15,7 @@ body {
     left: 0px;
     z-index: -1;
     opacity: 0.1;
+    display: none;
 }
 
 #app {

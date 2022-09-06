@@ -1,6 +1,7 @@
 import * as render from "./render.js";
 
 // hold data and settings
+let currentId = "";
 let currentData = {};
 let heightBars = [0, 1, 2, 3, 4, 5, 6, 7];
 let pieChart = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -73,16 +74,39 @@ function refreshRender() {
 }
 
 // socket go brr
-const socket = new WebSocket(`ws://${location.hostname}:${location.port}`);
+const socket = new WebSocket(`ws://${location.hostname}:${location.port}?overlay`);
 socket.addEventListener("message", function (data) {
 
     const msg = JSON.parse(data.data);
 
     switch (msg.type) {
+        // get own id and show
+        case "id":
+            currentId = msg.data;
+            document.querySelector("#id").innerText = currentId;
+            break;
+        // get new database data
         case "data":
             currentData = msg.data;
             refreshRender();
             break;
+        // set new settings, also hide id if shown
+        case "update":
+            document.querySelector("#id").style.display = "none";
+            break;
+        // request current settings
+        case "request":
+            socket.send(JSON.stringify({
+                type: "response",
+                data: {
+                    id: msg.data,
+                    heightBars,
+                    pieChart,
+                    diffBars
+                }
+            }));
+            break;
+        // idfk what happen
         default:
             console.error("Unknown message type \"" + msg.type + "\"");
     }
