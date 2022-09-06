@@ -18,7 +18,7 @@ wss.on("connection", function (ws) {
     });
 
     const txt = fs.readFileSync("./testdata.json", "utf-8");
-    ws.send(txt);
+    ws.send(JSON.stringify(JSON.parse(txt)));
 });
 
 // listen

@@ -2,110 +2,34 @@ body {
     margin: 0px;
     background-color: #000;
     color: #ffffff;
+
+    width: 1920px;
+    height: 1080px;
 }
 
 #template {
-    width: 100vw;
-    height: 100vh;
+    width: 1920px;
+    height: 1080px;
     position: absolute;
     top: 0px;
     left: 0px;
     z-index: -1;
-    opacity: 0.1;
+    opacity: 0.2;
 }
 
 #app {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     position: relative;
 }
 
-/* Difference bars */
-.db-l, .db-m, .db-r {
-    height: 40px;
+#appc {
     position: absolute;
-    overflow: hidden;
-
-    font-size: 25px;
-    text-overflow: clip;
-}
-
-.db-r {
-    width: 336px;
-    left: 99px;
-}
-.db-l, .db-m {
     top: 0px;
     left: 0px;
 }
 
-.db-l {
-    z-index: 30;
-}
-.db-m {
-    z-index: 20;
-}
-.db-r {
-    z-index: 10;
-}
-
-.db-large {
-    height: 68px;
-    font-size: 40px;
-}
-.db-large.db-r {
-    width: 586px;
-    left: 99px;
-}
-.db-large.db-l, .db-large.db-m {
-    top: 0px;
-    left: 0px;
-}
-
-#db-0.db-r {
-    top: 798px;
-    background-color: #7DBEE1;
-}
-#db-0 .db-l {
-    width: 272px;
-    background-color: #E02E3D;
-}
-
-#db-1.db-r {
-    top: 900px;
-    background-color: #7DBEE1;
-}
-#db-1 .db-l {
-    width: 116px;
-    background-color: #E02E3D;
-}
-#db-1 .db-m {
-    width: 207px;
-    background-color: #FFC346;
-}
-
-#db-2.db-r {
-    top: 949px;
-    background-color: #7DBEE1;
-}
-#db-2 .db-l {
-    width: 195px;
-    background-color: #E02E3D;
-}
-
-#db-3.db-r {
-    top: 999px;
-    background-color: #7DBEE1;
-}
-#db-3 .db-l {
-    width: 133px;
-    background-color: #E02E3D;
-}
-#db-3 .db-m {
-    width: 183px;
-    background-color: #911414;
-}
-
+/* pie chart */
 #pie-container {
     position: absolute;
     height: 182px;
