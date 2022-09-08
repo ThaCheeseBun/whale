@@ -1,9 +1,29 @@
 import path from "node:path";
 import http from "node:http";
 import fs from "node:fs";
+import fsp from "node:fs/promises";
 import express from "express";
 import { WebSocketServer } from "ws";
 import crypto from "node:crypto";
+import * as datahandler from "./src/datahandler.js";
+
+/*
+    TODO:
+    - Controlpanel
+    - Resuming via WS
+    - Autodownload of cert + verfication
+        - https://resultat.val.se/keys/val-sign-crt.pem
+        - https://eid.expisoft.se/nya-ca/expitrust-eid-ca-v4/
+    - Reorganizing
+    - General bugfixing
+*/
+
+// constants for various stuff
+export const STORAGE_DIR = "./storage";
+const PORT = 8080;
+
+// keep some stuff in ram for fast access
+let currentData = {updated:"2022-09-07T15:20:29"};
 
 // create and initialize servers
 const app = express();
@@ -60,10 +80,9 @@ wss.on("connection", function (ws) {
     });
 
     // send sample data cuz i no have data
-    const txt = fs.readFileSync("./testdata.json", "utf-8");
     ws.send(JSON.stringify({
         type: "data",
-        data: JSON.parse(txt),
+        data: currentData,
     }));
 });
 
@@ -85,7 +104,38 @@ server.on("upgrade", function (req, sock, head) {
     });
 });
 
-// listen
-server.listen(8081, function () {
-    console.log("Listening on port 8081");
-});
+// main init and loop
+(async function () {
+    const dataPath = path.resolve(STORAGE_DIR, "data.json");
+
+    // check if current data exist
+    let shouldMove = true;
+    try {
+        await fsp.access(dataPath, fs.constants.W_OK | fs.constants.R_OK);
+        // read current data
+        const rawData = await fsp.readFile(dataPath, "utf-8");
+        currentData = JSON.parse(rawData);
+    } catch (e) {
+        shouldMove = false;
+    }
+
+    // refresh for new data
+    const d = await datahandler.getData();
+    if (d) {
+        if (shouldMove) {
+            // move old data to archive folder
+            const oldDate = Date.parse(currentData.updated) / 1000;
+            const arcPath = path.resolve(STORAGE_DIR, "archive", `${oldDate}.json`);
+            await fsp.rename(dataPath, arcPath);
+        }
+        // save new to storage folder
+        const str = JSON.stringify(d, null, 4);
+        await fsp.writeFile(dataPath, str);
+    }
+
+    // listen
+    server.listen(PORT, function () {
+        console.log(`Listening on port ${PORT}`);
+    });
+})();
+

@@ -27,12 +27,12 @@ export function differenceBar(ctx, box, data, opts) {
     let values = [];
     let total = 0;
     for (const i in opts.data) {
-        const t = util.total(data, opts.data[i]);
+        const t = util.total(data.parties, opts.data[i]);
         values.push(t);
         total += t;
         shorts[i] = "";
         for (const j in opts.data[i]) {
-            shorts[i] += data[opts.data[i][j]].short +
+            shorts[i] += data.parties[opts.data[i][j]].short +
                 (j == opts.data[i].length - 1 ? "" : "+");
         }
     }
@@ -75,25 +75,25 @@ export function heightBars(ctx, box, data, opts) {
     const TXT_BLOCK = 90;
 
     // find highest percent
-    const high = util.highest(data, opts);
+    const high = util.highest(data.parties, opts);
     const space = (box[2] - (BAR_WIDTH * opts.length)) / (opts.length - 1);
     const maxHeight = box[3] - TXT_BLOCK;
 
     // populate bars
     let x = box[0];
     for (const i in opts) {
-        const h = (data[opts[i]].value / high) * maxHeight;
+        const h = (data.parties[opts[i]].value / high) * maxHeight;
 
-        ctx.fillStyle = data[opts[i]].color;
+        ctx.fillStyle = data.parties[opts[i]].color;
         ctx.fillRect(x, box[1] + (maxHeight - h), BAR_WIDTH, h + TXT_BLOCK);
 
         ctx.fillStyle = "#FFFFFF";
         ctx.font = "60px " + FONT;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(data[opts[i]].short, x + (BAR_WIDTH / 2), box[1] + maxHeight + (TXT_BLOCK / 2));
+        ctx.fillText(data.parties[opts[i]].short, x + (BAR_WIDTH / 2), box[1] + maxHeight + (TXT_BLOCK / 2));
 
-        const percent = data[opts[i]].percent.toFixed(1).replace(".", ",") + "%";
+        const percent = data.parties[opts[i]].percentage.toFixed(1).replace(".", ",") + "%";
         ctx.font = "30px " + FONT;
         ctx.textBaseline = "bottom";
         ctx.fillText(percent, x + (BAR_WIDTH / 2), box[1] + maxHeight);
@@ -104,20 +104,20 @@ export function heightBars(ctx, box, data, opts) {
 
 // pie chart go brr
 export function pieChart(ctx, data, opts) {
-    const total = util.total(data, opts);
+    const total = util.total(data.parties, opts);
     const middle = ctx.canvas.width / 2;
 
     let currentAngle = 0;
-    for (const i in data) {
+    for (const i in data.parties) {
         //calculating the angle the slice (portion) will take in the chart
-        const portionAngle = (data[opts[i]].value / total) * 2 * Math.PI;
+        const portionAngle = (data.parties[opts[i]].value / total) * 2 * Math.PI;
         //drawing an arc and a line to the center to differentiate the slice from the rest
         ctx.beginPath();
         ctx.arc(middle, middle, middle, currentAngle, currentAngle + portionAngle);
         currentAngle += portionAngle;
         ctx.lineTo(middle, middle);
         //filling the slices with the corresponding mood's color
-        ctx.fillStyle = data[opts[i]].color;
+        ctx.fillStyle = data.parties[opts[i]].color;
         ctx.fill();
     }
 }
