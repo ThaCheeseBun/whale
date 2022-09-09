@@ -1,3 +1,9 @@
+let currentData = {};
+
+function refreshData() {
+    
+}
+
 // socket go brr
 const socket = new WebSocket(`ws://${location.hostname}:${location.port}`);
 socket.addEventListener("message", function (data) {
@@ -11,6 +17,7 @@ socket.addEventListener("message", function (data) {
             break;
         case "data":
             currentData = msg.data;
+            refreshData();
             break;
         case "response":
             console.log(msg);

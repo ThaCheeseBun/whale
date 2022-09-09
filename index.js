@@ -23,7 +23,7 @@ export const STORAGE_DIR = "./storage";
 const PORT = 8080;
 
 // keep some stuff in ram for fast access
-let currentData = {updated:"2022-09-07T15:20:29"};
+let currentData = {};
 
 // create and initialize servers
 const app = express();
@@ -122,6 +122,7 @@ server.on("upgrade", function (req, sock, head) {
     // refresh for new data
     const d = await datahandler.getData();
     if (d) {
+        currentData = d;
         if (shouldMove) {
             // move old data to archive folder
             const oldDate = Date.parse(currentData.updated) / 1000;
