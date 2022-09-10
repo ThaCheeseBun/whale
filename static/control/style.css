@@ -3,9 +3,33 @@ body {
     background-color: #1c1c1c;
     color: #ffffff;
 }
+
+p, h1, h2, h3, h4, h5, h6 {
+    margin: 0px;
+}
+
 #id {
     position: absolute;
     top: 20px;
     right: 20px;
     font-size: 20px;
+}
+
+#showSelect, #colorSelect {
+    border: 1px solid #ffffff;
+    display: inline-block;
+    padding: 0.5rem 0.3rem;
+}
+#colorSelect {
+    padding: 0.5rem 0.5rem
+}
+.showSelectItem {
+    border: 1px dotted #ffffff;
+    display: inline-block;
+    padding: 0.5rem;
+    margin: 0px 0.2rem;
+    cursor: grab;
+}
+.colorSelectItem input {
+    width: 4rem;
 }

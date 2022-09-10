@@ -1,6 +1,6 @@
 import path from "node:path";
 import http from "node:http";
-import fs from "node:fs";
+import fs, { mkdirSync } from "node:fs";
 import fsp from "node:fs/promises";
 import express from "express";
 import { WebSocketServer } from "ws";
@@ -36,9 +36,7 @@ app.use(express.static(path.join(process.cwd(), "static")));
 wss.on("connection", function (ws) {
 
     ws.on("close", function () {
-        clients[ws.wid].timeout = setTimeout(function () {
-            delete clients[ws.wid];
-        }, 30000);
+        delete clients[ws.wid];
     });
 
     ws.on("message", function (data) {
@@ -46,18 +44,13 @@ wss.on("connection", function (ws) {
         switch (msg.type) {
             case "request":
 
-                const c1 = clients[msg.data];
-                if (!c1)
+                const c1 = clients[msg.peer];
+                if (!c1 || !c1.overlay)
                     return ws.send(JSON.stringify({
                         type: "response",
-                        err: "Client not found"
+                        err: "Client not found / overlay"
                     }));
-                if (!c1.overlay)
-                    return ws.send(JSON.stringify({
-                        type: "response",
-                        err: "Client not overlay"
-                    }));
-                c1.send(JSON.stringify({
+                c1.socket.send(JSON.stringify({
                     type: "request",
                     data: ws.wid
                 }));
@@ -68,8 +61,20 @@ wss.on("connection", function (ws) {
                 const c2 = clients[msg.data.id];
                 if (!c2 || c2.overlay)
                     return;
-                c2.send(JSON.stringify({
+                c2.socket.send(JSON.stringify({
                     type: "response",
+                    data: msg.data
+                }));
+
+                break;
+            case "update":
+
+                const c3 = clients[msg.peer];
+                if (!c3 || !c3.overlay)
+                    return;
+                c3.socket.send(JSON.stringify({
+                    type: "update",
+                    key: msg.key,
                     data: msg.data
                 }));
 
@@ -79,27 +84,29 @@ wss.on("connection", function (ws) {
         }
     });
 
-    // send sample data cuz i no have data
+    // send identification
+    ws.send(JSON.stringify({
+        type: "id",
+        data: ws.wid
+    }));
+
+    // send last data
     ws.send(JSON.stringify({
         type: "data",
-        data: currentData,
+        data: currentData
     }));
+
 });
 
 // handle websocket requests or "upgrades"
 server.on("upgrade", function (req, sock, head) {
     wss.handleUpgrade(req, sock, head, function (ws) {
-        if (req.url.includes("resume")) {
-            
-        } else {
-            const id = crypto.randomBytes(3).toString("hex");
-            clients[id] = {
-                overlay: req.url.includes("overlay"),
-                resume: crypto.randomBytes(4).toString("hex"),
-                socket: ws,
-            };
-            ws.wid = id;
-        }
+        const id = crypto.randomBytes(2).toString("hex");
+        clients[id] = {
+            overlay: req.url.includes("overlay"),
+            socket: ws,
+        };
+        ws.wid = id;
         wss.emit("connection", ws);
     });
 });

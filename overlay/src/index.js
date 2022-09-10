@@ -3,8 +3,10 @@ import * as render from "./render.js";
 // hold data and settings
 let currentId = "";
 let currentData = {};
-let heightBars = [0, 1, 2, 3, 4, 5, 6, 7];
-let pieChart = [0, 1, 2, 3, 4, 5, 6, 7];
+
+let barsChart = [];
+let color = {};
+
 let diffBars = [
     {
         data: [
@@ -59,11 +61,11 @@ function refreshRender() {
     const ctx = document.querySelector("#app").getContext("2d");
 
     // render the right bars
-    render.heightBars(ctx, [712, 700, 1060, 300], currentData, heightBars);
+    render.mainBars(ctx, [712, 700, 1060, 300], currentData, barsChart, color);
 
     // render pie chart
     const ctxPie = document.querySelector("#pie").getContext("2d");
-    render.pieChart(ctxPie, currentData, pieChart);
+    render.pieChart(ctxPie, currentData, barsChart, color);
 
     // b
     render.differenceBar(ctx, [100, 800, 586, 68], currentData, diffBars[0]);
@@ -88,11 +90,31 @@ socket.addEventListener("message", function (data) {
         // get new database data
         case "data":
             currentData = msg.data;
+
+            for (const i in currentData.parties) {
+                barsChart.push(i);
+                color[currentData.parties[i].short] = currentData.parties[i].color;
+            }
+
             refreshRender();
             break;
         // set new settings, also hide id if shown
         case "update":
             document.querySelector("#id").style.display = "none";
+            switch (msg.key) {
+                case "barsChart":
+                    barsChart = msg.data;
+                    break;
+                case "color":
+                    color = msg.data;
+                    break;
+                case "diffBars":
+                    diffBars = msg.data;
+                    break;
+                default:
+                    break;
+            }
+            refreshRender();
             break;
         // request current settings
         case "request":
@@ -100,8 +122,8 @@ socket.addEventListener("message", function (data) {
                 type: "response",
                 data: {
                     id: msg.data,
-                    heightBars,
-                    pieChart,
+                    barsChart,
+                    color,
                     diffBars
                 }
             }));

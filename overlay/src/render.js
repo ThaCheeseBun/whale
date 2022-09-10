@@ -21,6 +21,7 @@ const FONT = "Adumu";
 
 // the difference bars comparing stuff tm
 export function differenceBar(ctx, box, data, opts) {
+    ctx.clearRect(box[0], box[1], box[2], box[3]);
 
     // collect data
     let shorts = [];
@@ -70,7 +71,9 @@ export function differenceBar(ctx, box, data, opts) {
 }
 
 // create the chart of bars
-export function heightBars(ctx, box, data, opts) {
+export function mainBars(ctx, box, data, opts, color) {
+    ctx.clearRect(box[0], box[1], box[2], box[3]);
+
     const BAR_WIDTH = 94;
     const TXT_BLOCK = 90;
 
@@ -84,7 +87,7 @@ export function heightBars(ctx, box, data, opts) {
     for (const i in opts) {
         const h = (data.parties[opts[i]].value / high) * maxHeight;
 
-        ctx.fillStyle = data.parties[opts[i]].color;
+        ctx.fillStyle = color[data.parties[opts[i]].short];
         ctx.fillRect(x, box[1] + (maxHeight - h), BAR_WIDTH, h + TXT_BLOCK);
 
         ctx.fillStyle = "#FFFFFF";
@@ -103,7 +106,9 @@ export function heightBars(ctx, box, data, opts) {
 }
 
 // pie chart go brr
-export function pieChart(ctx, data, opts) {
+export function pieChart(ctx, data, opts, color) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
     const total = util.total(data.parties, opts);
     const middle = ctx.canvas.width / 2;
 
@@ -117,7 +122,7 @@ export function pieChart(ctx, data, opts) {
         currentAngle += portionAngle;
         ctx.lineTo(middle, middle);
         //filling the slices with the corresponding mood's color
-        ctx.fillStyle = data.parties[opts[i]].color;
+        ctx.fillStyle = color[data.parties[opts[i]].short];
         ctx.fill();
     }
 }

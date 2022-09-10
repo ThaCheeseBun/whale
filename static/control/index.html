@@ -9,17 +9,40 @@
 
 <body>
     <span id="id"></span>
-    <input id="testingText" type="text"/>
-    <button id="testing">submit</button>
 
-    <div id="mainBarsOpts">
-        <p>Main Bars</p>
+    <div>
+        <p>Remote peer id:</p>
+        <input id="peerInput" type="text"/>
+        <button id="peerSubmit">Get settings</button>
+    </div>
 
-        <p>Parties to show:</p>
-        <div>
-            <input type="checkbox" name="S" value="S" id="S">
-            <label for="S">S</label>
-        </div>
+    <br>
+
+    <div>
+        <p>Parties to show and order and whatever:</p>
+        <div id="showSelect"></div>
+        <br>
+        <button id="showSave">Save</button>
+        <button id="showLoad">Load</button>
+        <select id="showPreset">
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="2">3</option>
+        </select>
+        <br>
+        <button id="showApply">Apply</button>
+    </div>
+
+    <br>
+
+    <div>
+        <p>Colors for parties:</p>
+        <div id="colorSelect"></div>
+        <br>
+        <button id="colorSave">Save</button>
+        <button id="colorLoad">Load</button>
+        <br>
+        <button id="colorApply">Apply</button>
     </div>
 
     <script src="script.js" type="text/javascript"></script>
