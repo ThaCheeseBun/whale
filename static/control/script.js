@@ -2,57 +2,8 @@ let currentMyId = null;
 
 let firstTime = true;
 let currentData = null;
-let barsChart = {
-    order: [],
-    show: [],
-    color: []
-};
-let diffBars = [
-    {
-        order: [
-            [0, 1, 2, 3],
-            [4, 5, 6, 7]
-        ],
-        color: [
-            "#E02E3D",
-            "#7DBEE1"
-        ]
-    },
-    {
-        order: [
-            [0, 1, 2],
-            [7],
-            [3, 4, 5, 6]
-        ],
-        color: [
-            "#E02E3D",
-            "#FFC346",
-            "#7DBEE1"
-        ]
-    },
-    {
-        order: [
-            [0, 1, 2, 3, 4],
-            [5, 6, 7]
-        ],
-        color: [
-            "#E02E3D",
-            "#7DBEE1"
-        ]
-    },
-    {
-        order: [
-            [1, 2, 3],
-            [0],
-            [4, 5, 6, 7]
-        ],
-        color: [
-            "#E02E3D",
-            "#911414",
-            "#7DBEE1"
-        ]
-    }
-];
+let barsChart = null;
+let diffBars = null;
 
 // RENDER AND POPULATE BARSCHART SELECT
 let dragging, draggedOver;
@@ -148,7 +99,8 @@ function renderDiffBar() {
                 txt.push(currentData.parties[k].short);
             nodeText.value = txt.join(",")
             
-            nodeText.addEventListener("keydown", diffTextChange);
+            nodeText.addEventListener("keydown", diffTextKey);
+            nodeText.addEventListener("input", diffTextInput);
             nodeLine.appendChild(nodeText);
 
             const nodeColor = document.createElement("input");
@@ -192,7 +144,7 @@ function diffColorInput(e) {
     const j = e.target.parentNode.dataset.j;
     diffBars[i].color[j] = e.target.value;
 }
-function diffTextChange(e) {
+function diffTextKey(e) {
     if (e.keyCode == 13) {
         let o = [];
 
@@ -208,16 +160,81 @@ function diffTextChange(e) {
         const j = e.target.parentNode.dataset.j;
         diffBars[i].order[j] = o;
 
-        e.target.parentNode.classList.remove("unsaved");
-    } else {
-        e.target.parentNode.classList.add("unsaved");
+        e.target.parentNode.style.backgroundColor = "";
     }
+}
+function diffTextInput(e) {
+    e.target.parentNode.style.backgroundColor = "rgba(255, 255, 0, .2)";
 }
 
 // main refresh
 function refreshData() {
     renderMain();
     renderDiffBar();
+}
+
+// default data
+function defaultData(BARSCHARt, DIFFBARs) {
+    if (BARSCHARt) {
+        barsChart = {
+            order: [],
+            show: [],
+            color: []
+        };
+        for (const i in currentData.parties) {
+            barsChart.order.push(i);
+            barsChart.show.push(1);
+            barsChart.color.push(currentData.parties[i].color);
+        }
+    }
+    if (DIFFBARs) {
+        diffBars = [
+            {
+                order: [
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7]
+                ],
+                color: [
+                    "#E02E3D",
+                    "#7DBEE1"
+                ]
+            },
+            {
+                order: [
+                    [0, 1, 2],
+                    [7],
+                    [3, 4, 5, 6]
+                ],
+                color: [
+                    "#E02E3D",
+                    "#FFC346",
+                    "#7DBEE1"
+                ]
+            },
+            {
+                order: [
+                    [0, 1, 2, 3, 4],
+                    [5, 6, 7]
+                ],
+                color: [
+                    "#E02E3D",
+                    "#7DBEE1"
+                ]
+            },
+            {
+                order: [
+                    [1, 2, 3],
+                    [0],
+                    [4, 5, 6, 7]
+                ],
+                color: [
+                    "#E02E3D",
+                    "#911414",
+                    "#7DBEE1"
+                ]
+            }
+        ];
+    }
 }
 
 // socket go brr
@@ -233,11 +250,8 @@ socket.addEventListener("message", function (data) {
         case "data":
             currentData = msg.data;
             if (firstTime) {
-                for (const i in currentData.parties) {
-                    barsChart.order.push(i);
-                    barsChart.show.push(1);
-                    barsChart.color.push(currentData.parties[i].color);
-                }
+                firstTime = false;
+                defaultData(true, true);
             }
             refreshData();
             break;
@@ -265,7 +279,7 @@ function savePreset(src, slot, dest) {
     if (!src)
         return alert("Can't save nothing");
     if (!localStorage.getItem(dest))
-        localStorage.setItem(dest, "[{},{},{},{},{}]");
+        localStorage.setItem(dest, "[]");
     const presets = JSON.parse(localStorage.getItem(dest));
     presets[slot] = src;
     localStorage.setItem(dest, JSON.stringify(presets));
@@ -285,11 +299,19 @@ document.querySelector("#showLoad").addEventListener("click", function () {
     barsChart = loadPreset("showPreset", document.querySelector("#showPreset").value);
     refreshData();
 });
+document.querySelector("#showReset").addEventListener("click", function () {
+    defaultData(true, false);
+    refreshData();
+});
 
 document.querySelector("#diffBarSave").addEventListener("click", function () {
     savePreset(diffBars, document.querySelector("#diffBarPreset").value, "diffBarPreset");
 });
 document.querySelector("#diffBarLoad").addEventListener("click", function () {
     diffBars = loadPreset("diffBarPreset", document.querySelector("#diffBarPreset").value);
+    refreshData();
+});
+document.querySelector("#diffBarReset").addEventListener("click", function () {
+    defaultData(false, true);
     refreshData();
 });

@@ -24,7 +24,7 @@
     left: 0px;
     z-index: -1;
     opacity: 0.5;
-    display: none;
+    /*display: none;*/
 }
 
 #app {

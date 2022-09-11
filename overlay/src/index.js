@@ -25,6 +25,8 @@ function refreshRender() {
     render.differenceBar(ctx, [100, 950, 336, 40], currentData, diffBars[2]);
     render.differenceBar(ctx, [100, 1000, 336, 40], currentData, diffBars[3]);
 
+    render.renderAmount(ctx, [1421, 34, 400, 70], currentData);
+
 }
 
 // socket go brr

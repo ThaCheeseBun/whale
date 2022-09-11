@@ -60,9 +60,9 @@ export function differenceBar(ctx, box, data, opts) {
         // text x coordinate
         let txtx = (w / 2) + x;
         if (i == 0)
-            txtx = x + 5;
+            txtx = x;
         else if (i == opts.order.length - 1)
-            txtx = (box[0] + box[2]) - 5;
+            txtx = box[0] + box[2];
         // fill the text
         ctx.fillText(shorts[i], txtx, box[1] + (box[3] / 2), w);
 
@@ -129,4 +129,13 @@ export function pieChart(ctx, data, opts) {
         ctx.fillStyle = opts.color[tr[i]];
         ctx.fill();
     }
+}
+
+export function renderAmount(ctx, box, data) {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "36px " + FONT;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
+    const txt = `${data.districts.counted} / ${data.districts.total}`;
+    ctx.fillText(txt, box[0] + box[2], box[1] + box[3], box[0] - box[2]);
 }
