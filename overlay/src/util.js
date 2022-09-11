@@ -11,3 +11,14 @@ export function highest(d, o) {
             h = d[i].value;
     return h;
 }
+// due to me losing braincells at an alarming rate
+// i need to implement a different format so that
+// the control panel does not explode
+export function showConvert(o) {
+    let a = [];
+    for (const i of o.order) {
+        if (o.show[i])
+            a.push(i);
+    }
+    return a;
+}

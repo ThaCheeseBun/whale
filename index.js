@@ -42,37 +42,15 @@ wss.on("connection", function (ws) {
     ws.on("message", function (data) {
         const msg = JSON.parse(data);
         switch (msg.type) {
-            case "request":
+            case "update":
 
                 const c1 = clients[msg.peer];
                 if (!c1 || !c1.overlay)
                     return ws.send(JSON.stringify({
-                        type: "response",
-                        err: "Client not found / overlay"
+                        type: "error",
+                        data: "Client not found"
                     }));
                 c1.socket.send(JSON.stringify({
-                    type: "request",
-                    data: ws.wid
-                }));
-
-                break;
-            case "response":
-
-                const c2 = clients[msg.data.id];
-                if (!c2 || c2.overlay)
-                    return;
-                c2.socket.send(JSON.stringify({
-                    type: "response",
-                    data: msg.data
-                }));
-
-                break;
-            case "update":
-
-                const c3 = clients[msg.peer];
-                if (!c3 || !c3.overlay)
-                    return;
-                c3.socket.send(JSON.stringify({
                     type: "update",
                     key: msg.key,
                     data: msg.data
@@ -111,6 +89,32 @@ server.on("upgrade", function (req, sock, head) {
     });
 });
 
+// refresh new data from server
+async function refreshData() {
+    const dataPath = path.resolve(STORAGE_DIR, "data.json");
+
+    // refresh for new data
+    const d = await datahandler.getData();
+    if (d) {
+        // move old data to archive folder
+        const oldDate = Date.parse(currentData.updated) / 1000;
+        const arcPath = path.resolve(STORAGE_DIR, "archive", `${oldDate}.json`);
+        await fsp.rename(dataPath, arcPath);
+        // overwrite new data
+        currentData = d;
+        // broadcast to clients
+        for (const c of Object.keys(clients)) {
+            clients[c].socket.send(JSON.stringify({
+                type: "data",
+                data: d
+            }));
+        }
+        // save new to storage folder
+        const str = JSON.stringify(d, null, 4);
+        await fsp.writeFile(dataPath, str);
+    }
+}
+
 // main init and loop
 (async function () {
     const dataPath = path.resolve(STORAGE_DIR, "data.json");
@@ -129,17 +133,22 @@ server.on("upgrade", function (req, sock, head) {
     // refresh for new data
     const d = await datahandler.getData();
     if (d) {
-        currentData = d;
+        
         if (shouldMove) {
             // move old data to archive folder
             const oldDate = Date.parse(currentData.updated) / 1000;
             const arcPath = path.resolve(STORAGE_DIR, "archive", `${oldDate}.json`);
             await fsp.rename(dataPath, arcPath);
         }
+        // overwrite new data
+        currentData = d;
         // save new to storage folder
         const str = JSON.stringify(d, null, 4);
         await fsp.writeFile(dataPath, str);
     }
+
+    // loop refresh
+    setInterval(refreshData, 60 * 1000);
 
     // listen
     server.listen(PORT, function () {
