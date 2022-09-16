@@ -9,7 +9,6 @@ import * as datahandler from "./src/datahandler.js";
 
 /*
     TODO:
-    - Controlpanel
     - Resuming via WS
     - Autodownload of cert + verfication
         - https://resultat.val.se/keys/val-sign-crt.pem

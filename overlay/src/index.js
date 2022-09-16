@@ -25,6 +25,11 @@ function refreshRender() {
     render.differenceBar(ctx, [100, 950, 336, 40], currentData, diffBars[2]);
     render.differenceBar(ctx, [100, 1000, 336, 40], currentData, diffBars[3]);
 
+    // render 50% sepeartors for diff bars
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(100 + (586 / 2) - 4, 800 - 10, 8, 68 + 20);
+    ctx.fillRect(100 + (336 / 2) - 4, 900 - 10, 8, 140 + 20);
+
     render.renderAmount(ctx, [1421, 34, 400, 70], currentData);
 
 }

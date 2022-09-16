@@ -19,8 +19,8 @@ import {
 4: rd: riksdagsval, kf: kommunfull, rf: regionfull
 */
 const EXTRACT_REGEX = /Val_([0-9]+)_(preliminar|slutlig)_([0-9]+)_(RD|KF|RF)/;
-//const BASE_URL = "https://resultat.val.se/resultatfiler";
-const BASE_URL = "http://localhost:1337/resultatfiler";
+const BASE_URL = "https://resultat.val.se/resultatfiler";
+//const BASE_URL = "http://localhost:1337/resultatfiler";
 
 // promisified version of data getter
 function dataHelper(name, zip) {
@@ -132,26 +132,30 @@ export function getData() {
 
                         // request and open zip file
                         const sl = l.split("  ");
-                        const req2 = await fetch(`${BASE_URL}/${sl[1]}`);
-                        const buf = await req2.arrayBuffer();
-                        const zip = new Zip(Buffer.from(buf));
+                        try {
+                            const req2 = await fetch(`${BASE_URL}/${sl[1]}`);
+                            const buf = await req2.arrayBuffer();
+                            const zip = new Zip(Buffer.from(buf));
 
-                        // get main data file
-                        const entryNameData = `Val_${rl[1]}_${rl[2]}_mandatfordelning_${rl[3]}_${rl[4]}.json`;
-                        const data = await dataHelper(entryNameData, zip);
-                        // get signature file
-                        const entryNameSign = `Val_${rl[1]}_${rl[2]}_mandatfordelning_${rl[3]}_${rl[4]}_sign.sha256`;
-                        const sign = await dataHelper(entryNameSign, zip);
-                        // verify data against certificate
-                        const good = await verifyData(data, sign);
-                        if (!good)
-                            return rej(new Error("Verification failed"));
+                            // get main data file
+                            const entryNameData = `Val_${rl[1]}_${rl[2]}_mandatfordelning_${rl[3]}_${rl[4]}.json`;
+                            const data = await dataHelper(entryNameData, zip);
+                            // get signature file
+                            const entryNameSign = `Val_${rl[1]}_${rl[2]}_mandatfordelning_${rl[3]}_${rl[4]}_sign.sha256`;
+                            const sign = await dataHelper(entryNameSign, zip);
+                            // verify data against certificate
+                            const good = await verifyData(data, sign);
+                            if (!good)
+                                return rej(new Error("Verification failed"));
 
-                        // get and convert data
-                        const json = JSON.parse(data.toString("utf-8"));
-                        const converted = extractConvert(json);
+                            // get and convert data
+                            const json = JSON.parse(data.toString("utf-8"));
+                            const converted = extractConvert(json);
 
-                        return res(converted);
+                            return res(converted);
+                        } catch (e) {
+                            continue;
+                        }
 
                     }
 

@@ -93,10 +93,18 @@ export function mainBars(ctx, box, data, opts) {
         ctx.fillRect(x, box[1] + (maxHeight - h), BAR_WIDTH, h + TXT_BLOCK);
 
         ctx.fillStyle = "#FFFFFF";
+        if (data.parties[tr[i]].percentage < 4) {
+            ctx.fillStyle = "#FF0000";
+        }
         ctx.font = "60px " + FONT;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(data.parties[tr[i]].short, x + (BAR_WIDTH / 2), box[1] + maxHeight + (TXT_BLOCK / 2));
+        if (data.parties[tr[i]].percentage < 4) {
+            ctx.font = "66px " + FONT;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillText(data.parties[tr[i]].short, x + (BAR_WIDTH / 2), box[1] + maxHeight + (TXT_BLOCK / 2));
+        }
 
         const percent = data.parties[tr[i]].percentage.toFixed(1).replace(".", ",") + "%";
         ctx.font = "30px " + FONT;
@@ -132,6 +140,8 @@ export function pieChart(ctx, data, opts) {
 }
 
 export function renderAmount(ctx, box, data) {
+    ctx.clearRect(box[0], box[1], box[2], box[3]);
+
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "36px " + FONT;
     ctx.textAlign = "right";
